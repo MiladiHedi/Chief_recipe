@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+	<head>
+	    <meta charset="UTF-8"/>
+	    <nav class="navbar navbar-inverse navbar-fixed-top">
+	        <div class="container-fluid">
+	            <div class="navbar-header">
+	                <a class="navbar-brand" href="/" >Chief recipes</a>
+	            </div>
+	            <ul class="nav navbar-nav">
+	                <li class="active"><a href="#"  th:text="${recipe.name}"></a></li>
+	                
+	            </ul>
+	        </div>
+	    </nav>
+	
+	    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
+	          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}">
+	
+	    <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+	
+	
+	    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+	            crossorigin="anonymous" th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+	</head>
+	<body>
+	<br><br><br>
+		<div class="container-fluid" style="margin-top: 20px">
+		    <div class="row">
+		        <div class="col-md-6 col-md-offset-3">
+		            <div class="pannel-group">
+		                <div class="panel panel-primary">
+		                    <div class="panel-heading">
+		                        <div class="col-md-10">
+		                            <h1 class="panel-title" th:text="${recipe.name}">Recipe Description</h1>   
+		                        </div>
+		                        <form action="#" th:action="@{'/recipe/' + ${recipe.id} + '/update'}" th:object="${recipe}" method="get">
+		                              <button type="submit" class="btn btn-success">Update</button>
+		                        </form>
+		                    </div> 
+		                 
+		                    <div class="panel-body">
+		                        <div class="row">
+		                            <div class="col-md-3">
+		                                <h5>Categories:</h5>
+		                            </div>
+		                            <div class="col-md-9">
+		                                <ul>
+		                                    <li th:each="cat : ${recipe.categories}" th:text="${cat.getDescription()}"> </li>
+		                                </ul>
+		                            </div>
+		                        </div>
+		                        <div class="row">
+		                            <div class="col-md-3">
+		                                <h5>Prep Time:</h5>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <td th:text="${recipe.prepTime}">334</td>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <h5>Difficulty:</h5>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <td th:text="${recipe.difficulty}"></td>
+		                            </div>
+		                        </div>
+		                        <div class="row">
+		                            <div class="col-md-3">
+		                                <h5>Cooktime:</h5>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <td th:text="${recipe.cookTime}"></td>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <h5>Servings:</h5>
+		                            </div>
+		                            <div class="col-md-3">
+		                                <td th:text="${recipe.servings}"></td>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="panel panel-primary">
+		                    <div class="panel-heading">
+		                        <h1 class="panel-title" >Ingredients</h1>
+		                    </div>
+		                    <div class="panel-body">
+		                        <div class="row">
+		                            <div class="col-md-12">
+		                                <ul>
+		                                     <li th:each="ingredient : ${recipe.getIngredients()}" 
+		                                        th:text="${ingredient.getAmount()} + ' '+
+		                                        ${ingredient.uom.value.toLowerCase()}+ ' of '+
+		                                        ${ingredient.name}"
+		                                        > 
+		                                    </li>
+		                                   
+		                                </ul>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                <div class="panel panel-primary">
+		                    <div class="panel-heading">
+		                        <h1 class="panel-title" >Recipe</h1>
+		                    </div>
+		                    <div class="panel-body">
+		                        <div class="row">
+		                            <div class="col-md-12">
+		                                <td th:text="${recipe.content}">334</td>
+		                            </div>
+		                        </div>
+		                    </div>
+		                </div>
+		                
+		                <div class="panel panel-primary">
+		                	<div class="panel-heading">
+		                    	<h1 class="panel-title">Comments</h1>
+		                    </div>
+		                    <div th:each="comment : ${recipe.comments}">
+								<div class="panel panel-info col-md-12">
+									<div class="panel-heading col-md-10">
+								    	<p th:text="${comment.author} + ' wrote :'"  /></p>
+									</div>
+									<div class="panel-heading col-md-2">
+								    	<p class="text-right" th:text="${comment.date}">Right aligned text.</p>
+									</div>
+										
+								    <div class="panel-body">
+								    	<td th:text="${comment.comContent}" />
+								    	<br>
+									</div> 
+								</div>
+							</div>	
+							<div class="panel panel-title "><label>Add your comment</label></div>
+								<form  th:object="${comment}" th:action="@{/recipe/comment}"  method="post">
+								 	<input type="hidden" id="recipe_id" th:field="${recipe.id}"/>
+								 
+
+								    
+								    <div class="col-md-12 form-group">
+								    	<div>
+										    
+										    <div  th:class="${#fields.hasErrors('author')}
+	                                				? 'col-md-12 form-group has-error' : 'col-md-12 form-group'">
+	                                				<br>
+	                                			<div class="col-md-12 form-group">
+													<label>Your pseudo : </label>
+												</div>
+											    <span class="help-block" th:if="${#fields.hasErrors('author')}">
+					                            	<ul>
+					                                	<li th:each="err : ${#fields.errors('author')}" th:text="${err}"/>
+					                                </ul>
+					                            </span>
+					                            <input type="text" class="col-md-4 form-group" th:field="*{author}"/>  	
+											</div>
+											
+									    	<div  th:class="${#fields.hasErrors('comContent')}
+                                				? 'col-md-12 form-group has-error' : 'col-md-12 form-group'">
+                                				<div class="col-md-12 form-group">
+													<label>Your comment :</label>
+												</div>
+			                                    
+			                                    <span class="help-block" th:if="${#fields.hasErrors('comContent')}">
+			                                        <ul>
+			                                            <li th:each="err : ${#fields.errors('comContent')}" th:text="${err}"/>
+			                                        </ul>
+			                                    </span>
+			                                    <textarea class="col-md-12 form-group" rows="5" th:field="*{comContent}"></textarea> 
+			                                    
+			                                </div>
+			                            </div>
+	                                 </div>
+	                                 
+	                                 
+                                
+	                                 <button type="submit" class="btn btn-primary">Send comment</button>
+	                                 
+	                                 
+								 
+		                    	</form>
+		                    </div>
+						</div>
+			    	</div>
+		        </div>
+		   </div>
+	</body>
+	
+<br><br><br><br>
+<div class="footer navbar-inverse navbar-fixed-bottom">
+
+	<div class="col-xs-10 col-sm-5	 col-md-5">
+	</div>
+	<div class="col-xs-12 col-sm-5 col-md-5">
+	
+		<ul class="nav navbar-nav navbar-center">
+			<li class="inactive">
+				<a href="https://github.com/MiladiHedi/simple_java_webApp" >---> My gitHub</a>
+			</li>     
+		</ul>
+		<br>
+		<br>
+	</div>
+	<div class="col-xs-10 col-sm-5	 col-md-5">
+	</div>
+</div>
+</html>

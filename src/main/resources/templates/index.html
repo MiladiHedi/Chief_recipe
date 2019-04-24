@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#">Chief recipes</a>
+            </div>
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Recipes</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"
+          th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}">
+
+    <script src="/webjars/jquery/1.11.1/jquery.min.js"></script>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous" th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+
+</head>
+<body>
+<br><br><br>
+
+<div class="container-fluid" style="margin-top: 20px">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-primary">
+            	<div th:text="${appId}" >
+            	</div>
+                <div class="panel-heading">
+                    <h1 class="panel-title">Famous recipes</h1>
+                </div>
+                <div class="panel-footer">
+                    <div class="panel-body">
+                    <div class="table-responsive" th:if="${not #lists.isEmpty(recipes)}">
+                        <table class="table table-hover ">
+                            <thead class="thead-inverse">
+                            <tr>
+                                <th>ID</th>
+                                <th>name</th>
+                                
+                            </tr>
+                            </thead>
+                           
+                            <tr th:each="recipe : ${recipes}">
+                                <td th:text="${recipe.id}"></td>
+                                <td th:text="${recipe.name}"></td>
+                                <td>
+                                    <p>
+                                        <a th:href="@{'/recipe/' + ${recipe.id} + '/show'}">
+                                        <span class="glyphicon glyphicon-eye-open"></span>
+                                    </p>
+                                </td>
+                                <td>
+                                    <p>
+                                        <a th:href="@{'/recipe/' + ${recipe.id} + '/update'}">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                    </p>
+                                </td>
+                                <td>
+                                    <p>
+                                        <a  th:href="@{'/recipe/' + ${recipe.id} + '/delete'}">
+                                        <span class="glyphicon glyphicon-trash"></span>
+                                    </p>
+                                </td>
+                                
+                               
+                            </tr>
+                            
+                        </table>
+                        <div>
+                        	<a  th:href="@{'/recipe/new'}" >
+                        	<span class="glyphicon glyphicon-plus"></span>
+                        </div>
+                        	
+                    </div>
+                </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+
+<div class="footer navbar-inverse navbar-fixed-bottom">
+	<div class="col-xs-10 col-sm-5	 col-md-5">
+	</div>
+	<div class="col-xs-12 col-sm-5 col-md-5">
+	
+		<ul class="nav navbar-nav navbar-center">
+			<li class="inactive">
+				<a href="https://github.com/MiladiHedi/simple_java_webApp" >---> My gitHub</a>
+			</li>     
+		</ul>
+		<br>
+		<br>
+	</div>
+	<div class="col-xs-10 col-sm-5	 col-md-5">
+	</div>
+</div>
+</html>

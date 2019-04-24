@@ -1,0 +1,15 @@
+target
+target/*
+.classpath
+.project
+.settings
+.settings/*
+!.mvn/wrapper/maven-wrapper.jar
+
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+images/mysql/data
+images/mysql/data/*

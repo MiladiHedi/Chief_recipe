@@ -1,0 +1,83 @@
+version: '3'
+services:
+  db:
+    container_name: db
+    image: mysql:5.7
+    ports:
+      - "3306:3306"  
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootp
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes: 
+      - ./compose/mysql/data:/var/lib/mysql
+      - ./compose/mysql/init:/docker-entrypoint-initdb.d
+    networks: 
+      - backend
+
+  app1:
+    container_name: app1
+    build:
+      context: .
+    ports: 
+      - "8081:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=integration
+      - APP_ID=app1
+      - DB_PORT=3306
+      - DB_HOST=db
+      - DB_NAME=recipe_db_integration
+      #user and password from script here mysql/init/database-init.sql 
+      - DB_USERNAME=dev
+      - DB_PASSWORD=devp
+    links: 
+      - db
+    networks: 
+      - backend
+
+  app2:
+    container_name: app2
+    build:
+      context: .
+    ports: 
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=integration
+      - APP_ID=app2
+      - DB_PORT=3306
+      - DB_HOST=db
+      - DB_NAME=recipe_db_integration
+      #user and password from script here mysql/init/database-init.sql 
+      - DB_USERNAME=dev
+      - DB_PASSWORD=devp
+    links: 
+      - db
+    networks: 
+      - backend
+
+  portainer:
+    image: portainer/portainer
+    container_name: portainer-app
+    volumes: 
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "9000:9000"
+    networks:
+      - backend
+
+  nginx: 
+    image: nginx:latest
+    container_name: nginx
+    volumes:
+      - ./compose/nginx/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 8083:80
+      - 443:443
+    networks:
+      - backend
+    links:
+      - app1
+      - app2
+
+networks:
+  backend:
+    driver: "bridge"
