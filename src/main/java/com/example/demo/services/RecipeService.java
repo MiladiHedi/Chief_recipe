@@ -2,29 +2,30 @@ package com.example.demo.services;
 
 import java.util.Set;
 
+import com.example.demo.formcommand.CommentCommand;
 import com.example.demo.formcommand.RecipeCommand;
-import com.example.demo.model.Comment;
 import com.example.demo.model.Recipe;
+
+import javassist.NotFoundException;
 
 public interface RecipeService {
 
     Set<Recipe> getRecipes();
 
-    Recipe findById(Long id);
-        
-    Recipe saveCommandRecipe(RecipeCommand beanRecipe);
+    Recipe findById(long id) throws NotFoundException;
     
-	RecipeCommand findRecipeCommandById(Long id);
+	RecipeCommand findRecipeCommandById(long id);
+        
+    Recipe saveCommandRecipe(RecipeCommand recipeCommand);
 
-	void deleteById(Long id);
+	void deleteById(long id);
 
-	RecipeCommand findCompleteCommandRecipeById(Long id);
+	RecipeCommand addEmptyIngredient(RecipeCommand recipeCommand);
 
-	RecipeCommand addEmptyIngredient(RecipeCommand recipeBean);
+	RecipeCommand saveRecipeComment(long recipeId, CommentCommand commentCommand);
 
-	Recipe addComment(long recipeId, Comment comment);
+	RecipeCommand removeIngredient(RecipeCommand recipeCommand, long ingredientId);
 
-	RecipeCommand removeIngredient(RecipeCommand recipe, long ingredientId);
-	
+	RecipeCommand getRecipeCommandWithAllCategories();
 	
 }

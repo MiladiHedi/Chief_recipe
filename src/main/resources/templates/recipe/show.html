@@ -135,7 +135,7 @@
 								</div>
 							</div>	
 							<div class="panel panel-title "><label>Add your comment</label></div>
-								<form  th:object="${comment}" th:action="@{/recipe/comment}"  method="post">
+								<form  th:object="${comment}" th:action="@{/recipe/${recipe.id}/comment}"  method="post">
 								 	<input type="hidden" id="recipe_id" th:field="${recipe.id}"/>
 								 
 

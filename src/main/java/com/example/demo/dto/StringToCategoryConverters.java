@@ -23,12 +23,13 @@ public class StringToCategoryConverters implements Converter<String, CategoryCom
 	
 	@Override
 	public CategoryCommand convert(String source) {
+		
 		Long parsedId = Long.parseLong(source);
 		Optional<Category> category = categoryRepository.findById(parsedId);
-		if (null == category.get()) {
-			return null;
-		} else {
+		if ( category.isPresent()) {
 			return categoryToCategoryCommandConverter.convert(category.get());
+		} else {
+			return null;
 		}
 		
 	}
