@@ -1,9 +1,6 @@
 package com.example.demo.controllers;
 
-
-
 import javax.validation.Valid;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,17 +13,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.formcommand.CommentCommand;
-import com.example.demo.formcommand.RecipeCommand;
-import com.example.demo.model.Comment;
-import com.example.demo.model.Recipe;
+import com.example.demo.form.CommentCommand;
+import com.example.demo.form.RecipeCommand;
 import com.example.demo.services.CategoryService;
+import com.example.demo.services.CommentService;
 import com.example.demo.services.RecipeService;
 
 @Controller
 public class RecipeController {
 	
-	private final static Logger log = LoggerFactory.getLogger(RecipeController.class);
+	private static final  Logger log = LoggerFactory.getLogger(RecipeController.class);
 
 	private static final String RECIPE_FORM_TEMPLATE = "recipe/form";
 	private static final String RECIPE_SHOW_TEMPLATE = "recipe/show";
@@ -34,7 +30,8 @@ public class RecipeController {
     private final RecipeService recipeService;
 	private final CategoryService categoryService;
 
-    public RecipeController(RecipeService recipeService, CategoryService categoryService) {
+    public RecipeController(RecipeService recipeService, 
+    		CategoryService categoryService, CommentService commentService) {
         this.recipeService = recipeService;
         this.categoryService = categoryService;
     }
@@ -67,7 +64,7 @@ public class RecipeController {
     @RequestMapping(value ="/recipe/new" , method = RequestMethod.GET)
     public String recipeForm(Model model) {
     	
-    	RecipeCommand commandRecipe = recipeService.getRecipeCommandWithAllCategories();
+    	RecipeCommand commandRecipe = recipeService.getEmptyRecipeCommandWithAllCategories();
         model.addAttribute("recipe",commandRecipe);
         
         return RECIPE_FORM_TEMPLATE;
@@ -97,7 +94,7 @@ public class RecipeController {
     @PostMapping(value="/recipe")
     public String saveRecipe(@Valid @ModelAttribute("recipe")  RecipeCommand recipeCommand, BindingResult bindingResult, Model model) {
     	
-    	if(bindingResult.hasErrors()){
+     	if(bindingResult.hasErrors()){
 
             bindingResult.getAllErrors().forEach(objectError -> {
             	log.debug(objectError.toString());
@@ -107,9 +104,9 @@ public class RecipeController {
             return RECIPE_FORM_TEMPLATE;
         }
     	log.debug( "recipe bean:"+recipeCommand);
-    	Recipe recipe = recipeService.saveCommandRecipe(recipeCommand);
+    	RecipeCommand recipe = recipeService.saveCommandRecipe(recipeCommand);
     	model.addAttribute("recipe", recipe);
-    	model.addAttribute("comment", new Comment());
+    	model.addAttribute("comment", new CommentCommand());
     	return RECIPE_SHOW_TEMPLATE;
     }
     
@@ -119,7 +116,7 @@ public class RecipeController {
      * @param model
      * @return
      */
-    @RequestMapping(value ="/recipe/{id}/delete", method = RequestMethod.DELETE)
+    @RequestMapping("/recipe/{id}/delete")
     public String deleteById(@PathVariable String id, Model model){
 
         log.debug("Deleting recipe id: " + id);
@@ -140,7 +137,8 @@ public class RecipeController {
      */
     @RequestMapping(value="/recipe", params={"addIngredient"}, method = RequestMethod.POST)
     public String addIngredient(RecipeCommand recipe,  BindingResult bindingResult, Model model) {
-    	RecipeCommand result = this.recipeService.addEmptyIngredient(recipe);
+    	RecipeCommand result = this.recipeService.addEmptyIngredientToForm(recipe);
+    	result.setCategories(this.categoryService.fillCommandCategories(result.getCategories()));
     	
     	model.addAttribute("recipe", result);
     	return RECIPE_FORM_TEMPLATE;
@@ -153,7 +151,7 @@ public class RecipeController {
      * @param model
      * @return
      */
-    @RequestMapping(value="/recipe", params={"deleteIngredient"}, method = RequestMethod.DELETE)
+    @RequestMapping(value="/recipe", params={"deleteIngredient"})
     public String deleteIngredientById( @RequestParam("deleteIngredient") long index,
     	RecipeCommand recipe, Model model ){
     	
@@ -163,38 +161,8 @@ public class RecipeController {
         return RECIPE_FORM_TEMPLATE;
     }
     
-    /**
-     * request to save a new comment
-     * @param recipe
-     * @param comment
-     * @param bindingResult
-     * @param model
-     * @return
-     */
-    @PostMapping(value="/recipe/{id}/comment")
-    public String addComment(@PathVariable String id, RecipeCommand recipeCommand , @Valid  CommentCommand comment, 
-    		BindingResult bindingResult, Model model) {
-    	
-    	long recipeId = Long.parseLong(id);
-    	
-    	if(bindingResult.hasErrors()){
-
-            bindingResult.getAllErrors().forEach(objectError -> {
-                log.debug(objectError.toString());
-            });
-            
-            model.addAttribute("recipe", recipeCommand);
-        	model.addAttribute("comment", comment);
-            return RECIPE_SHOW_TEMPLATE;
-        }
-    	
-    	
-    	RecipeCommand resultsaved = this.recipeService.saveRecipeComment(recipeId, comment);
-    	model.addAttribute("recipe", resultsaved);
-    	model.addAttribute("comment", new Comment());
-    	return RECIPE_SHOW_TEMPLATE;
-    }
     
+ 
 
     
     

@@ -8,13 +8,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 
-
+@EnableCaching
 @SpringBootApplication
 public class WebAppApplication extends SpringBootServletInitializer  {
 	
-	private final static Logger log = LoggerFactory.getLogger(WebAppApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(WebAppApplication.class);
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder WebAppApplication) {

@@ -1,6 +1,5 @@
 package com.example.demo.services;
 
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -11,18 +10,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.demo.dto.CommentCommandToComment;
-import com.example.demo.dto.CommentToCommentCommand;
-import com.example.demo.dto.RecipeCommandToRecipe;
-import com.example.demo.dto.RecipeToRecipeCommand;
+import com.example.demo.converter.RecipeCommandToRecipe;
+import com.example.demo.converter.RecipeToRecipeCommand;
+import com.example.demo.entities.Ingredient;
+import com.example.demo.entities.Recipe;
 import com.example.demo.exception.NotFoundException;
-import com.example.demo.formcommand.CategoryCommand;
-import com.example.demo.formcommand.CommentCommand;
-import com.example.demo.formcommand.IngredientCommand;
-import com.example.demo.formcommand.RecipeCommand;
-import com.example.demo.model.Comment;
-import com.example.demo.model.Ingredient;
-import com.example.demo.model.Recipe;
+import com.example.demo.form.CategoryCommand;
+import com.example.demo.form.IngredientCommand;
+import com.example.demo.form.RecipeCommand;
 import com.example.demo.repositories.RecipeRepository;
 
 
@@ -32,40 +27,31 @@ public class RecipeServiceImpl implements RecipeService {
 
 	private final RecipeRepository recipeRepository;
 	private final CategoryService categoryService;
-	@SuppressWarnings("unused")
-	private final IngredientService ingredientService;
+	private final RecipeCommandToRecipe recipeCommandToRecipe;
+	private final RecipeToRecipeCommand recipeToRecipeCommand;
 
-
-	private RecipeCommandToRecipe recipeCommandToRecipe;
-	private RecipeToRecipeCommand recipeToRecipeCommand;
-	private CommentCommandToComment commentCommandToComment;
-	@SuppressWarnings("unused")
-	private CommentToCommentCommand commentToCommentCommand;
-
-	private final static Logger log = LoggerFactory.getLogger(RecipeServiceImpl.class);
+	private static final Logger log = LoggerFactory.getLogger(RecipeServiceImpl.class);
 
 	public RecipeServiceImpl(RecipeRepository recipeRepository,
 			CategoryService categoryService,
 			RecipeCommandToRecipe recipeCommandToRecipe,
-			RecipeToRecipeCommand recipeToRecipeCommand, 
-			IngredientService ingredientService,
-			CommentCommandToComment commentCommandToComment,
-			CommentToCommentCommand commentToCommentCommand) {
+			RecipeToRecipeCommand recipeToRecipeCommand) {
 
 		this.recipeRepository = recipeRepository;
 		this.categoryService = categoryService;
 		this.recipeCommandToRecipe = recipeCommandToRecipe;
 		this.recipeToRecipeCommand = recipeToRecipeCommand;
-		this.ingredientService = ingredientService;
-		this.commentCommandToComment = commentCommandToComment;
-		this.commentToCommentCommand = commentToCommentCommand;
 	}
 
 	@Override
-	public Set<Recipe> getRecipes() {
-		Set<Recipe> recipeSet = new HashSet<>();
-		recipeRepository.findAll().iterator().forEachRemaining(recipeSet::add);
-		return recipeSet;
+	public Set<RecipeCommand> getRecipes() {
+		Iterable<Recipe> recipeSet = new HashSet<>();
+		Set<RecipeCommand> recipeCommandSet = new HashSet<>();
+		recipeSet = recipeRepository.findAll();
+		for (Recipe recipe : recipeSet) {
+			recipeCommandSet.add(this.recipeToRecipeCommand.convert(recipe));
+		}
+		return recipeCommandSet;
 	}
 
 	@Override
@@ -79,17 +65,17 @@ public class RecipeServiceImpl implements RecipeService {
 	}
 
 	/**
-	 * saveCommandRecipe save a recipe in db
+	 * saveRecipe save a recipe in db
 	 */
 	@Override
 	@Transactional
-	public Recipe saveCommandRecipe(RecipeCommand recipeCommand) {
+	public RecipeCommand saveCommandRecipe(RecipeCommand recipeCommand) {
 
-		Recipe detachedRecipe = recipeCommandToRecipe.convert(recipeCommand);
+		Recipe recipe = recipeCommandToRecipe.convert(recipeCommand);
 		//remove empty ingredients
 		Set<Ingredient> ingredients = new HashSet<>();
 		//in ui we can add any empty ingredients so when we save we remove empty ingredients
-		for (Ingredient ingredient : detachedRecipe.getIngredients()) {
+		for (Ingredient ingredient : recipe.getIngredients()) {
 
 			if (ingredient.getId() < 0) {
 				//it's a new ingredient we had put a negative id in order to can remove it if user remove an unsaved ingredient
@@ -99,11 +85,13 @@ public class RecipeServiceImpl implements RecipeService {
 			ingredients.add(ingredient);
 
 		}
-		detachedRecipe.setIngredients(ingredients);
-		Recipe savedRecipe = recipeRepository.save(detachedRecipe);
-
+		recipe.setIngredients(ingredients);
+		Recipe savedRecipe = recipeRepository.save(recipe);
 		log.debug(String.format("Recipe id '{0}' is saved.", savedRecipe.getId()));
-		return savedRecipe;
+
+		RecipeCommand savedRecipeCommand = this.recipeToRecipeCommand.convert(savedRecipe);
+
+		return savedRecipeCommand;
 	}
 
 	@Override
@@ -156,36 +144,16 @@ public class RecipeServiceImpl implements RecipeService {
 	 * addEmptyIngredient add ingredient to form only (not save in db)
 	 */
 	@Override
-	public RecipeCommand addEmptyIngredient(RecipeCommand recipeCommand) {
+	public RecipeCommand addEmptyIngredientToForm(RecipeCommand recipeCommand) {
 
 		//the new ingredient are not saved, we don't know what will do the user so we put an temporary negative id 
 		//( id is needed to delete an ingredient
 		IngredientCommand newIngredient = new IngredientCommand();
 		long randomid = (long) (Math.floor(Math.random() * 9_999_999_999L) + 9_000_000_000L)*(-1);
-
 		newIngredient.setId(randomid);
 		recipeCommand.getIngredients().add(newIngredient);
-		recipeCommand.setCategories(this.categoryService.fillCommandCategories(recipeCommand.getCategories()));
+
 		return recipeCommand;
-	}
-
-	/**
-	 * saveRecipeComment save a comment in db
-	 * @throws NotFoundException 
-	 */
-	@Override
-	@Transactional
-	public RecipeCommand saveRecipeComment(long recipeId, CommentCommand commentCommand) {
-
-		Recipe recipe = this .findById(recipeId);
-		Comment comment = this.commentCommandToComment.convert(commentCommand);
-		comment.setDate(new Date());
-		recipe.addComment(comment);
-
-		Recipe savedRecipe = recipeRepository.save(recipe);
-		RecipeCommand recipeCommandSaved = this.recipeToRecipeCommand.convert(savedRecipe);
-
-		return recipeCommandSaved;
 	}
 
 
@@ -193,7 +161,7 @@ public class RecipeServiceImpl implements RecipeService {
 	 * return a RecipeCommand filled by categories from database
 	 */
 	@Override
-	public RecipeCommand getRecipeCommandWithAllCategories() {
+	public RecipeCommand getEmptyRecipeCommandWithAllCategories() {
 		RecipeCommand commandRecipe =new RecipeCommand();
 		commandRecipe.setCategories(this.categoryService.findAllCategoryCommand());
 		return commandRecipe;

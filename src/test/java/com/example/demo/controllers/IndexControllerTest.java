@@ -21,7 +21,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
-import com.example.demo.model.Recipe;
+import com.example.demo.entities.Recipe;
+import com.example.demo.form.RecipeCommand;
 import com.example.demo.services.RecipeService;
 
 //@PropertySource(value = "classpath:application.yml", encoding = "UTF-8")
@@ -55,10 +56,10 @@ public class IndexControllerTest {
     public void getIndexPage() throws Exception {
 
         //given
-        Set<Recipe> recipes = new HashSet<>();
-        recipes.add(new Recipe());
+        Set<RecipeCommand> recipes = new HashSet<>();
+        recipes.add(new RecipeCommand());
 
-        Recipe recipe = new Recipe();
+        RecipeCommand recipe = new RecipeCommand();
         recipe.setId(1L);
 
         recipes.add(recipe);

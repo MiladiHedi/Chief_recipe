@@ -22,12 +22,9 @@
     	
     	<div class="col-md-6 col-md-offset-3" >
       		<h1>Http Error Code: 404. Resource not found</h1>
-            <p th:text="${exception.getMessage()}"></p>
+            <p th:text="${exception.toString()}"></p>
         </div>
-        <div class="col-md-6 col-md-offset-3">
-            <h1 th:text="${exception.getMessage()}"></h1>
-            <p th:text="${exception.getMessage()}"></p>
-        </div>
+
     </div>
 </div>
 

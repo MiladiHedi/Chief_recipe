@@ -25,7 +25,7 @@ At the fisrt time, wait for complete initialisation of database and then run
 ```
 docker-compose up -d
 ```
-## Use it
+## How to use
 
 You can check these url address :
 * app1 (replicas1) : http://localhost:8081/recipeWebApp/

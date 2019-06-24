@@ -70,6 +70,7 @@
                                 </div>
                                 <div class="col-md-9">
 	                                <th:block th:each="category, stat : *{categories}">
+	                                
 		                                <div th:if="${category.checked}">
 		                                	<input type="checkbox" th:value="${category.id}" checked="checked" th:id="categories__${stat.index}__" name="categories"/>
 		                                	<input type="hidden" name="_categories" value="on"/>
@@ -117,7 +118,7 @@
                                 <div class="col-md-3 form-group">
                                     <label>Difficulty:</label>
                                     <select th:field="${recipe.difficulty}">
-				                         <option th:each="state : ${T(com.example.demo.model.Difficulty).values()}"
+				                         <option th:each="state : ${T(com.example.demo.entities.Difficulty).values()}"
 				                            th:selected="${state}"
 				                            th:value="${state}"
 				                            th:text="${state}"/>
@@ -159,7 +160,7 @@
 	                                	</td>
 										<td>
 											<select class="form-control" th:field="*{ingredients[__${stat.index}__].uom}">
-					                         	<option th:each="state : ${T(com.example.demo.model.UnitOfMeasure).values()}"
+					                         	<option th:each="state : ${T(com.example.demo.entities.UnitOfMeasure).values()}"
 					                            th:value="${state}"
 					                            th:text="${state}"/>
 				                   			</select>
@@ -169,7 +170,6 @@
 										<td>
 
 								              <button type="submit" name="deleteIngredient" th:value="${ingredient.id}">delete ingredient</button>
-										
 											
 							        </tr>
 							        
@@ -236,9 +236,12 @@
 					<div th:each="ingredient, stat : *{comments}" >
 						<tr>
 							<td> 
+								<input type="hidden"  th:field="*{comments[__${stat.index}__].id}" th:attr="value = ${ingredient.getId()}"/>	
 							    <input type="hidden"  th:field="*{comments[__${stat.index}__].comContent}" th:attr="value = ${ingredient.getComContent()}"/>
 	                        	<input type="hidden"  th:field="*{comments[__${stat.index}__].author}" th:attr="value = ${ingredient.getAuthor()}"/>
 							    <input type="hidden"  th:field="*{comments[__${stat.index}__].date}" th:attr="value = ${ingredient.getDate()}"/>
+	                        	<input type="hidden"  th:field="*{comments[__${stat.index}__].recipeId}" th:attr="value = ${ingredient.getRecipeId()}"/>	
+	                        	
 	                        </td>
 						</tr>
 					 </div>

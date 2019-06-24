@@ -15,12 +15,12 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import com.example.demo.WebAppApplication;
-import com.example.demo.model.Category;
-import com.example.demo.model.Comment;
-import com.example.demo.model.Difficulty;
-import com.example.demo.model.Ingredient;
-import com.example.demo.model.Recipe;
-import com.example.demo.model.UnitOfMeasure;
+import com.example.demo.entities.Category;
+import com.example.demo.entities.Comment;
+import com.example.demo.entities.Difficulty;
+import com.example.demo.entities.Ingredient;
+import com.example.demo.entities.Recipe;
+import com.example.demo.entities.UnitOfMeasure;
 import com.example.demo.repositories.CategoryRepository;
 import com.example.demo.repositories.RecipeRepository;
 
@@ -32,7 +32,7 @@ public class LoadFixtures implements ApplicationListener<ContextRefreshedEvent> 
     private final CategoryRepository categoryRepository;
     private final RecipeRepository recipeRepository;
 
-	private final static Logger log = LoggerFactory.getLogger(WebAppApplication.class);
+	private static final Logger log = LoggerFactory.getLogger(WebAppApplication.class);
 
 	
     public LoadFixtures(CategoryRepository categoryRepository, 
@@ -119,9 +119,17 @@ public class LoadFixtures implements ApplicationListener<ContextRefreshedEvent> 
             		+ "adhibens modum orientis latera cuncta vexabat nec honoratis parcens nec urbium "
             		+ "primatibus nec plebeiis.");
 
-            Comment recipe1comment1 = new Comment(recipe1, "Good recipe", "John Doe", new Date());
-            Comment recipe1comment2 = new Comment(recipe1, "uuuh yes it suits me", "Jack Sparrow", new Date());
-
+            Comment recipe1comment1 = new Comment();
+            recipe1comment1.setAuthor("John Doe");
+            recipe1comment1.setComContent("Good recipe");
+            recipe1comment1.setRecipe(recipe1);
+            recipe1comment1.setDate(new Date());
+            Comment recipe1comment2 = new Comment();
+            recipe1comment2.setAuthor("Jack Sparrow");
+            recipe1comment2.setComContent("uuuh yes it suits me");
+            recipe1comment2.setRecipe(recipe1);
+            recipe1comment2.setDate(new Date());
+            
             recipe1.addComment(recipe1comment1);
             recipe1.addComment(recipe1comment2);
 
@@ -161,8 +169,18 @@ public class LoadFixtures implements ApplicationListener<ContextRefreshedEvent> 
             		+ "studiorum omnium maximum ab ortu lucis ad vesperam sole fatiscunt vel pluviis, "
             		+ "per minutias aurigarum equorumque praecipua vel delicta scrutantes.");
          
-            Comment recipe2comment1 = new Comment(recipe2, "Good recipe", "John Doe", new Date());
-            Comment recipe2comment2 = new Comment(recipe2, "uuuh yes it suits me", "Jack Sparrow", new Date());
+
+            Comment recipe2comment1 = new Comment();
+            recipe2comment1.setAuthor("John Doe");
+            recipe2comment1.setComContent("Good recipe");
+            recipe2comment1.setRecipe(recipe2);
+            recipe2comment1.setDate(new Date());
+            
+            Comment recipe2comment2 = new Comment();
+            recipe2comment2.setAuthor("Jack Sparrow");
+            recipe2comment2.setComContent("uuuh yes it suits me");
+            recipe2comment2.setRecipe(recipe2);
+            recipe2comment2.setDate(new Date());
 
             recipe2.addComment(recipe2comment1);
             recipe2.addComment(recipe2comment2);

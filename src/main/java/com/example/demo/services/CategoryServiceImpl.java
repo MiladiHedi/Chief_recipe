@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.dto.CategoryToCategoryCommand;
-import com.example.demo.formcommand.CategoryCommand;
-import com.example.demo.model.Category;
+import com.example.demo.converter.CategoryToCategoryCommand;
+import com.example.demo.entities.Category;
+import com.example.demo.form.CategoryCommand;
 import com.example.demo.repositories.CategoryRepository;
 
 
@@ -21,9 +23,9 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     
 	private final CategoryToCategoryCommand categoryToCategoryBean;
-
+	
 	@SuppressWarnings("unused")
-	private final static Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
+	private  static final Logger log = LoggerFactory.getLogger(CategoryServiceImpl.class);
 
     public CategoryServiceImpl(CategoryRepository categoryRepository, 
     		CategoryToCategoryCommand categoryToCategoryBean) {
@@ -32,10 +34,11 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryToCategoryBean = categoryToCategoryBean;
     }
 
+    @Cacheable(value="AllCategory") 
 	@Override
 	public List<CategoryCommand>  findAllCategoryCommand() {
 		
-		List<Category> categories = new ArrayList<Category>();
+		List<Category> categories = new ArrayList<>();
 		categoryRepository.findAll().iterator().forEachRemaining(categories::add);
 		List<CategoryCommand> commandCategories = convertCategories(categories);
 		return commandCategories;
@@ -63,15 +66,30 @@ public class CategoryServiceImpl implements CategoryService {
 	 * fill add all categories from db to a CommandCategories array from client
 	 */
 	@Override
-	public List<CategoryCommand>  fillCommandCategories(List<CategoryCommand>  Categories) {
-		List<CategoryCommand>  allCategory = this.findAllCategoryCommand();
+	public List<CategoryCommand>  fillCommandCategories(List<CategoryCommand>  categories) {
 		
+		List<CategoryCommand>  allCategory = this.findAllCategoryCommand();
+		return this.mergeCommandCategories(categories, allCategory);
+	}
+
+	@Override
+	public List<Category> findCategoriesByRecipeId(long recipeid) {
+		
+		List<Category> categories = new ArrayList<>();
+		categoryRepository.findAllByRecipes_Id(recipeid).iterator().forEachRemaining(categories::add);
+        
+		return categories;
+	}
+
+	@Override
+	public List<CategoryCommand> mergeCommandCategories(List<CategoryCommand> categories,
+			List<CategoryCommand> allCategory) {
 		Map<String, CategoryCommand> recipeCategoryMap = new HashMap<String, CategoryCommand>();
 		for (CategoryCommand categoryBean : allCategory) {
 			recipeCategoryMap.put(categoryBean.getDescription(), categoryBean);		
 		}
 		//erase category of recipe (checked)
-		for (CategoryCommand category : Categories) {
+		for (CategoryCommand category : categories) {
 			//each Categories are from client (ui), but incomplete, we set checked to true
 			category.setChecked(true);
 			recipeCategoryMap.put(category.getDescription(), category);		
@@ -79,15 +97,6 @@ public class CategoryServiceImpl implements CategoryService {
 		
 		List<CategoryCommand>  commandCategoryArray = new ArrayList<CategoryCommand>(recipeCategoryMap.values());
 		return commandCategoryArray;
-	}
-
-	@Override
-	public List<Category> findCategoriesByRecipeId(long recipeid) {
-		
-		List<Category> categories = new ArrayList<Category>();
-		categoryRepository.findAllByRecipes_Id(recipeid).iterator().forEachRemaining(categories::add);
-        
-		return categories;
 	}
 
 

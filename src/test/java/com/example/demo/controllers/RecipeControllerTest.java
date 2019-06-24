@@ -14,8 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import com.example.demo.model.Recipe;
+import com.example.demo.entities.Recipe;
 import com.example.demo.services.CategoryService;
+import com.example.demo.services.CommentService;
 import com.example.demo.services.RecipeService;
 
 //@PropertySource(value = "classpath:application-test.yml", encoding = "UTF-8")
@@ -24,18 +25,21 @@ public class RecipeControllerTest {
 
     @Mock
     RecipeService recipeService;
+    @Mock
+    CommentService commentService;
+    @Mock
     CategoryService categoryService;
     
     RecipeController controller;
 
-	private final static Logger log = LoggerFactory.getLogger(RecipeControllerTest.class);
+	private static final Logger log = LoggerFactory.getLogger(RecipeControllerTest.class);
 
 	
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        controller = new RecipeController(recipeService, categoryService);
+        controller = new RecipeController(recipeService, categoryService, commentService);
     }
 
     @Test

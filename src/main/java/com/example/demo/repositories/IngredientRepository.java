@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
-import com.example.demo.model.Ingredient;
-import com.example.demo.model.Recipe;
+import com.example.demo.entities.Ingredient;
+import com.example.demo.entities.Recipe;
 
 
 public interface IngredientRepository extends CrudRepository<Ingredient, Long> {

@@ -2,8 +2,8 @@ package com.example.demo.services;
 
 import java.util.List;
 
-import com.example.demo.formcommand.CategoryCommand;
-import com.example.demo.model.Category;
+import com.example.demo.entities.Category;
+import com.example.demo.form.CategoryCommand;
 
 
 public interface CategoryService {
@@ -16,4 +16,6 @@ public interface CategoryService {
 	List<CategoryCommand>  findCompleteCategoriesCommandByRecipeId(long recipeid);
 	
 	List<CategoryCommand>  fillCommandCategories(List<CategoryCommand>  Categories);
+
+	List<CategoryCommand> mergeCommandCategories(List<CategoryCommand> categories, List<CategoryCommand> categories2);
 }
